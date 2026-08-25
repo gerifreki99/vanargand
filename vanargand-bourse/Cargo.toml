@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-bourse"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Canaux de micro-paiements a deux parties : etats signes, PayWord, guetteurs remuneres, parade a la fraude C9 (fermeture unilaterale en partition). Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

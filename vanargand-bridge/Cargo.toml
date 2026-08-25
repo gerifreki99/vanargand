@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-bridge"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Ponts inter-chaines : gels nominatifs a destination unique, fenetres de contestation, jalons croises (parades D1-D6). Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

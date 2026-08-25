@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-archive"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Archive-desserte : defis a reponse chronometree, triangulation de latence, sert l'historique public de la chaine plutot que de le sceller. Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

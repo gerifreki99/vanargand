@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-state"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Arbre de Merkle epars (SMT) et execution deterministe des transitions d'etat : soldes, solde nomade, noms, gardiens, appareils, cautions de validateurs. Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

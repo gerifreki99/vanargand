@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-crypto"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Primitives cryptographiques (ML-DSA-44, ML-KEM-768, BLAKE3, ChaCha20-Poly1305, HKDF) -- seul point d'acces aux primitives, isole le choix de bibliotheque post-quantique du reste du code. Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

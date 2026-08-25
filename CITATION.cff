@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "Vanargand: a partition-tolerant ledger design for intermittently connected networks"
+message: "If you refer to this work, please cite it as below."
+type: software
+authors:
+  - family-names: "Geri"
+    given-names: "Freki"
+    orcid: "https://orcid.org/0009-0006-7503-459X"
+repository-code: "https://github.com/gerifreki99/vanargand"
+abstract: >-
+  Vanargand is a design for a distributed ledger in which network partition is the
+  normal operating regime rather than a failure mode. It covers a finality
+  ladder with deterministic reconciliation, bounded offline spending with
+  self-proving account equivocation, and payment channels hardened against
+  closure during partition.
+keywords:
+  - distributed ledger
+  - partition tolerance
+  - offline payments
+  - payment channels
+  - post-quantum cryptography
+  - byzantine fault tolerance
+license: "MIT OR Apache-2.0"
+version: "0.1.0"
+date-released: "2026-08-18"

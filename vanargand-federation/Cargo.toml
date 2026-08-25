@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-federation"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Fondation libre de chaines, roles facteur et eclaireur, monnaies locales, frontiere et preuves d'emission de la zone VAN. Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

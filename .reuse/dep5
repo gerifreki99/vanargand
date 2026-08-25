@@ -1,0 +1,35 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Vanargand
+Upstream-Contact: Freki Geri <geri.freki99@gmail.com>
+Source: https://github.com/gerifreki99/vanargand
+
+# ---------------------------------------------------------------------------
+# Default: source code, dual-licensed following the Rust ecosystem convention.
+# ---------------------------------------------------------------------------
+Files: *
+Copyright: 2026 Freki Geri
+License: MIT OR Apache-2.0
+
+# ---------------------------------------------------------------------------
+# Design documents, threat model, revision logs: attribution required,
+# reuse and reimplementation permitted.
+# ---------------------------------------------------------------------------
+Files: docs/*
+       spec/*
+       README.md
+       CONTRIBUTING.md
+       SECURITY.md
+Copyright: 2026 Freki Geri
+License: CC-BY-4.0
+
+# ---------------------------------------------------------------------------
+# Conformance test vectors: public domain, so that any implementation can use
+# them without considering licensing.
+# ---------------------------------------------------------------------------
+Files: spec/vectors/*
+Copyright: 2026 Freki Geri
+License: CC0-1.0
+
+# ---------------------------------------------------------------------------
+# Third-party material: append entries here as dependencies are vendored.
+# ---------------------------------------------------------------------------

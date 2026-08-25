@@ -1,0 +1,17 @@
+Vanargand
+Copyright 2026 Freki Geri
+
+This product includes software developed by Freki Geri.
+
+Licensed under either of
+
+  * Apache License, Version 2.0 (see LICENSE-APACHE)
+  * MIT license (see LICENSE-MIT)
+
+at your option.
+
+Design documents and specifications under docs/ and spec/ are licensed under
+CC-BY-4.0 (see LICENSE-DOCS). Conformance test vectors under spec/vectors/ are
+released under CC0-1.0 to permit unrestricted use by any implementation.
+
+Third-party notices, if any, will be appended below as dependencies are added.

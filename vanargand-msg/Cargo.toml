@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-msg"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Messagerie chiffree de bout en bout : etablissement de session, double cliquet (ratchet), MLS pour les groupes, relais pour destinataires absents. Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

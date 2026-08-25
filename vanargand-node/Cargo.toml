@@ -1,0 +1,8 @@
+﻿[package]
+name = "vanargand-node"
+version = "0.0.0"
+edition = "2021"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+description = "Assemblage du noeud complet : relie crypto/types/state/consensus/net, expose le RPC consomme par les clients legers. Reserve -- implementation a venir."
+repository = "https://github.com/gerifreki99/vanargand"

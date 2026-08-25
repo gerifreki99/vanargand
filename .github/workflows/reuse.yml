@@ -1,0 +1,20 @@
+# Verifie que chaque fichier du depot declare correctement sa licence
+# (SPDX en-tete, fichier .license, ou entree .reuse/dep5), a chaque push
+# et sur chaque pull request. Bloque la fusion si un fichier est ajoute
+# sans licence declaree -- humain ou IA.
+#
+# Ne fait rien tant que ce depot n'est pas sur GitHub. Une fois pousse,
+# le badge de statut peut etre ajoute au README avec :
+#   [![REUSE status](https://github.com/gerifreki99/vanargand/actions/workflows/reuse.yml/badge.svg)](https://github.com/gerifreki99/vanargand/actions/workflows/reuse.yml)
+name: REUSE Compliance
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  reuse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: fsfe/reuse-action@v3
