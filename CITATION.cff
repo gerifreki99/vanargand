@@ -20,6 +20,8 @@ keywords:
   - payment channels
   - post-quantum cryptography
   - byzantine fault tolerance
-license: "MIT OR Apache-2.0"
+license:
+  - MIT
+  - Apache-2.0
 version: "0.1.0"
 date-released: "2026-08-18"
