@@ -1,4 +1,4 @@
-cff-version: 1.2.0
+cff-version: 1.1.0
 title: "Vanargand: a partition-tolerant ledger design for intermittently connected networks"
 message: "If you refer to this work, please cite it as below."
 type: software
