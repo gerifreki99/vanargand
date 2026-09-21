@@ -9,11 +9,16 @@ SPDX-License-Identifier: CC-BY-4.0
 
 **Une conception de registre tolérant aux partitions, pour réseaux à connectivité intermittente.**
 
-> **État : phase de conception. Il n'existe aucune implémentation.**
-> Ce dépôt contient des documents de conception, un modèle de menace et des
-> journaux de révision. Rien ici n'a été audité, relu par des pairs, ni exécuté
-> en production. Plusieurs problèmes centraux sont ouverts — voir
-> [Problèmes ouverts](#problèmes-ouverts).
+> **État : phase de conception, l'implémentation du socle commence.**
+> Ce dépôt contient des documents de conception, un modèle de menace, des
+> journaux de révision, une spécification à l'état de brouillon, des vecteurs de
+> conformité, et des caisses Rust implémentant l'encodage, l'interface des
+> primitives, les objets canoniques et le registre. **Aucune chaîne n'a jamais
+> tourné.** Rien ici n'a été audité ni relu par des pairs. Plusieurs problèmes
+> centraux sont ouverts — voir [Problèmes ouverts](#problèmes-ouverts) — et le
+> code n'a aucune bibliothèque post-quantique branchée, donc il ne sait pas
+> vérifier une vraie signature aujourd'hui. Voir
+> [Ce qui est implémenté](#ce-qui-est-implémenté) pour la frontière exacte.
 
 ---
 
@@ -86,13 +91,56 @@ rentable — **dépend actuellement de C7** et doit se lire comme une conjecture
 attente de mesure, non comme un résultat. Le journal de révision retrace
 l'affaiblissement de cette thèse par rapport à sa formulation initiale.
 
+## Ce qui est implémenté
+
+| Domaine | État |
+|---|---|
+| Encodage canonique, avec rejet des encodages non canoniques | Implémenté, vecteurs |
+| Séparation de domaine BLAKE3, chaînes de hachage (PayWord, engagements) | Implémenté, vecteurs |
+| Hiérarchie de clés, identifiants de compte et d'appareil, Bech32m `van1…` | Implémenté, vecteurs |
+| Nonce 2D, état des voies | Implémenté |
+| Enveloppe de transaction, 21 types, grammaire du provisoire (C9) | Implémenté |
+| Preuve d'équivoque de compte (R2) | Implémenté |
+| En-tête de bloc, échelle de finalité, horloges de contestation | Implémenté |
+| Arbre de Merkle épars, preuves d'inclusion **et de non-inclusion** | Implémenté |
+| Registre : 6 types de transaction sur 21, plafond nomade appliqué | Partiel |
+| Bibliothèques post-quantiques (signature, KEM) | **Interface seule** |
+| Consensus, réseau, messagerie, bourses, stockage, ponts | Non commencé |
+
+La couche signature mérite d'être isolée. `vanargand-crypto` contient le
+registre des algorithmes, les traits, et une suite de conformité
+comportementale qu'une bibliothèque candidate doit passer — mais **aucune
+bibliothèque post-quantique n'est encore une dépendance**, et c'est un état
+assumé, pas un oubli. Un adaptateur écrit contre une API que personne n'a
+compilée a l'air fini et ne l'est pas. Voir
+[`vanargand-crypto/BACKENDS.md`](vanargand-crypto/BACKENDS.md).
+
+Deux trouvailles nées de l'écriture du code sont consignées dans le brouillon
+de spécification plutôt que résolues discrètement : le plafond hors-ligne ne
+couvre pas les monnaies locales, c'est-à-dire exactement le paiement autour
+duquel le pilote du Cran 1 est construit
+([`04-transactions.md`](spec/draft/04-transactions.md) §4.1) ; et le seuil des
+noms premium de la R1.7 contredit son propre exemple `@marie` (§6.1).
+
 ## Organisation du dépôt
 
 ```
-docs/          Documents de conception, modèle de menace, révisions (R1, R2)
-spec/          Spécification gelée, versionnée
-spec/vectors/  Vecteurs de test de conformité (CC0)
+docs/               Documents de conception, modèle de menace, révisions (R1, R2)
+spec/draft/         Spécification, brouillon de travail — non gelée
+spec/vectors/       Vecteurs de test de conformité (CC0)
+tools/vectorgen/    Une seconde implémentation, en Python, qui les engendre
+vanargand-crypto/   Interface des primitives : hachage, chaînes, clés, traits
+vanargand-types/    Encodage canonique, identifiants, adresses, transactions, blocs
+vanargand-state/    Arbre de Merkle épars, modèle de compte, transitions d'état
+vanargand-*/        Réservées, documentées, non implémentées
 ```
+
+Les vecteurs sont engendrés par une implémentation Python écrite depuis la
+prose de `spec/draft/`, délibérément pas depuis le Rust. Des vecteurs engendrés
+par l'implémentation qu'ils testent ne prouvent qu'une chose : que
+l'implémentation est d'accord avec elle-même. L'intégration continue pose les
+deux questions séparément — le Rust correspond-il aux vecteurs, et les vecteurs
+correspondent-ils encore à la spécification dont ils sont tirés.
 
 ## Journaux de révision
 
@@ -105,7 +153,7 @@ revendications centrales. Ils sont publiés délibérément.
 
 | Contenu | Licence |
 |---------|---------|
-| Code (quand il existera) | `MIT OR Apache-2.0` |
+| Code | `MIT OR Apache-2.0` |
 | Documents et spécifications | `CC-BY-4.0` |
 | Vecteurs de test de conformité | `CC0-1.0` |
 
@@ -125,9 +173,18 @@ Voir [`CONTRIBUTING.fr.md`](CONTRIBUTING.fr.md). Les contributions sont accepté
 sous le Developer Certificate of Origin — une ligne `Signed-off-by` dans chaque
 commit. Il n'y a pas de CLA.
 
-À ce stade, la contribution la plus utile n'est pas du code. C'est un argument
-établissant qu'un des mécanismes décrits ici ne fonctionne pas. Si vous en
-trouvez un, ouvrez une issue.
+À ce stade, la contribution la plus utile n'est toujours pas du code. C'est un
+argument établissant qu'un des mécanismes décrits ici ne fonctionne pas. Si vous
+en trouvez un, ouvrez une issue.
+
+La deuxième plus utile est un désaccord entre les deux implémentations. Là où
+`tools/vectorgen/generate.py` et les caisses Rust divergent, l'une des deux a
+tort — ou la spécification est assez ambiguë pour que deux lecteurs en tirent
+deux choses, ce qui est le plus précieux des trois cas.
+
+Ensuite : une bibliothèque post-quantique qui passe
+`vanargand_crypto::sign::conformance::check`, et les quinze types de transaction
+que le registre n'applique pas encore.
 
 ## Sécurité
 

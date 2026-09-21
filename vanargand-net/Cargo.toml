@@ -1,8 +1,18 @@
-﻿[package]
+# SPDX-FileCopyrightText: 2026 Freki Geri
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[package]
 name = "vanargand-net"
-version = "0.0.0"
-edition = "2021"
-authors = ["Freki Geri <geri.freki99@gmail.com>"]
-license = "MIT OR Apache-2.0"
-description = "Pile reseau (rust-libp2p) : transports QUIC/TCP/WebRTC/mDNS/BLE, gossipsub (blocks/txs/msgs/svc), DHT Kademlia. Reserve -- implementation a venir."
-repository = "https://github.com/gerifreki99/vanargand"
+description = "Pile reseau (rust-libp2p) : transports QUIC/TCP/WebRTC/mDNS/BLE, gossipsub (blocks/txs/msgs/svc), DHT Kademlia."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+vanargand-types.workspace = true

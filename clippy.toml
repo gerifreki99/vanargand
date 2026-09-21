@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: 2026 Freki Geri
+# SPDX-License-Identifier: MIT OR Apache-2.0
+#
+# CONTRIBUTING.md forbids non-deterministic collections and the system clock in
+# state-transition code. This file turns those sentences into build failures.
+
+msrv = "1.85"
+
+# In a test, a panic is the assertion. The deny-level panic lints in
+# Cargo.toml's workspace lints apply to library code only.
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
+allow-panic-in-tests = true
+
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "iteration order is randomised per process and will diverge honest nodes; use BTreeMap, or IndexMap where insertion order carries meaning" },
+    { path = "std::collections::HashSet", reason = "iteration order is randomised per process and will diverge honest nodes; use BTreeSet" },
+    { path = "std::collections::hash_map::HashMap", reason = "see std::collections::HashMap" },
+    { path = "std::collections::hash_set::HashSet", reason = "see std::collections::HashSet" },
+]
+
+disallowed-methods = [
+    { path = "std::time::SystemTime::now", reason = "the only clock in Vanargand is block height (CONTRIBUTING.md)" },
+    { path = "std::time::Instant::now", reason = "the only clock in Vanargand is block height; wall-clock measurement belongs to the archive-desserte transport layer, not to state" },
+]
