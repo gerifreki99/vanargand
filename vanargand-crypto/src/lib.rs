@@ -21,7 +21,7 @@
 //!   protocol is required to use.
 //! - [`chain`] — hash chains, which are both the consensus randomness beacon
 //!   (A4) and the PayWord micro-payment scheme, read in opposite directions.
-//! - [`derive`] — the key hierarchy: one master seed, everything else derived.
+//! - [`mod@derive`] — the key hierarchy: one master seed, everything else derived.
 //! - [`sign`] / [`kem`] — algorithm-agnostic signature and key-encapsulation
 //!   interfaces, plus the backend registry.
 //!

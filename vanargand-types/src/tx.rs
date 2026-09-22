@@ -1132,12 +1132,21 @@ mod tests {
     fn discriminants_are_unique_and_never_zero() {
         // Zero is reserved so that a zeroed buffer fails rather than selecting
         // something, exactly as for algorithm identifiers.
-        let mut seen = BTreeSet::new();
+        //
+        // `every_kind()` holds two `Transfer` entries on purpose (native and
+        // local-asset, to exercise the `Option<AssetId>` round trip), so this
+        // checks one discriminant per *name*, not per fixture entry — a real
+        // collision between two different variants still fails the assertion.
+        let mut seen_names = BTreeSet::new();
+        let mut seen_discriminants = BTreeSet::new();
         for kind in every_kind() {
+            if !seen_names.insert(kind.name()) {
+                continue;
+            }
             let discriminant = kind.discriminant();
             assert_ne!(discriminant, 0, "{} took the reserved zero", kind.name());
             assert!(
-                seen.insert(discriminant),
+                seen_discriminants.insert(discriminant),
                 "{} reuses discriminant {discriminant}",
                 kind.name()
             );

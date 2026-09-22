@@ -54,7 +54,7 @@ pub fn list_root(leaves: &[Hash]) -> Hash {
 
 fn fold_level(level: &[Hash]) -> Vec<Hash> {
     let mut next = Vec::with_capacity(level.len().div_ceil(2));
-    let mut index = 0;
+    let mut index: usize = 0;
     while index.saturating_add(1) < level.len() {
         let (Some(left), Some(right)) = (level.get(index), level.get(index.saturating_add(1)))
         else {

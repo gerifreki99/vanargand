@@ -264,8 +264,10 @@ mod tests {
 
     #[test]
     fn a_bech32_string_is_rejected_as_such() {
+        // "A12UEL5L" is the official BIP-173 valid-Bech32 test vector: it
+        // verifies under the Bech32 constant, not the Bech32m one.
         assert_eq!(
-            Address::from_str("A1G7SGD8"),
+            Address::from_str("A12UEL5L"),
             Err(AddressError::Bech32(Bech32Error::WrongVariantBech32))
         );
     }

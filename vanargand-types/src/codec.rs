@@ -784,7 +784,8 @@ mod tests {
     #[test]
     fn bools_are_exactly_two_bytes() {
         for byte in 0_u8..=255 {
-            let mut decoder = Decoder::new(&[byte]).unwrap();
+            let buf = [byte];
+            let mut decoder = Decoder::new(&buf).unwrap();
             match byte {
                 0 => assert_eq!(decoder.read_bool(), Ok(false)),
                 1 => assert_eq!(decoder.read_bool(), Ok(true)),
@@ -848,7 +849,8 @@ mod tests {
     #[test]
     fn options_reject_tags_other_than_zero_and_one() {
         for byte in 2_u8..=255 {
-            let mut decoder = Decoder::new(&[byte]).unwrap();
+            let buf = [byte];
+            let mut decoder = Decoder::new(&buf).unwrap();
             assert_eq!(decoder.read_option::<u64>(), Err(CodecError::BadOptionTag(byte)));
         }
     }

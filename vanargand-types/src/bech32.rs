@@ -356,7 +356,7 @@ mod tests {
             ("lt1igcx5c0", "invalid data character 'i'"),
             ("in1muywd", "too short data part"),
             ("mm1crxm3i", "invalid data character 'i'"),
-            ("A1G7SGD8", "this is Bech32, not Bech32m"),
+            ("A12UEL5L", "this is Bech32, not Bech32m"),
             ("16plkw9", "empty hrp"),
             ("1p2gdwpf", "empty hrp"),
         ] {
@@ -366,9 +366,11 @@ mod tests {
 
     #[test]
     fn a_bech32_string_is_reported_as_bech32_not_as_a_typo() {
-        // "A1G7SGD8" is a valid Bech32 string. A wallet should be able to tell
-        // its user "wrong kind of address", not "check for a typo".
-        assert_eq!(decode("A1G7SGD8"), Err(Bech32Error::WrongVariantBech32));
+        // "A12UEL5L" is the official BIP-173 valid-Bech32 test vector: it
+        // verifies under the Bech32 checksum constant, not Bech32m's. A wallet
+        // should be able to tell its user "wrong kind of address", not "check
+        // for a typo".
+        assert_eq!(decode("A12UEL5L"), Err(Bech32Error::WrongVariantBech32));
     }
 
     #[test]
