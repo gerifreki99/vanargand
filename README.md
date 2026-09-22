@@ -96,6 +96,17 @@ folding them silently into the design. They record decisions that were made,
 found to be wrong, and replaced — including two corrections to the design's
 central claims. They are published deliberately.
 
+## AI assistance
+
+This work was developed with AI assistance. Large language models were used for
+drafting and revising the design documents, for adversarial review of the design,
+and for literature search.
+
+They are tools, not authors, and nothing here rests on a model's authority. Every
+design decision, every claim, and every error is the author's. Where a claim is
+weak it is marked open rather than smoothed over — see
+[Open problems](#open-problems) and the revision logs above.
+
 ## Licensing
 
 | Content | License |

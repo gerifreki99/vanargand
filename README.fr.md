@@ -101,6 +101,19 @@ que repliés silencieusement dans la conception. Ils consignent des décisions
 prises, jugées fausses, puis remplacées — dont deux corrections portant sur les
 revendications centrales. Ils sont publiés délibérément.
 
+## Assistance par IA
+
+Ce travail a été développé avec l'accompagnement de l'IA. Des grands modèles de
+langage ont été utilisés pour la rédaction et la révision des documents de
+conception, pour la revue adverse de la conception, et pour la recherche
+bibliographique.
+
+Ce sont des outils, pas des auteurs, et rien ici ne repose sur l'autorité d'un
+modèle. Chaque décision de conception, chaque revendication et chaque erreur
+appartient à l'auteur. Là où une revendication est faible, elle est signalée
+comme ouverte plutôt que lissée — voir [Problèmes ouverts](#problèmes-ouverts)
+et les journaux de révision ci-dessus.
+
 ## Licences
 
 | Contenu | Licence |
