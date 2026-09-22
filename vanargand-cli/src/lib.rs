@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+// SPDX-FileCopyrightText: 2026 Freki Geri
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+//! Command-line tool: key management and interaction with a node.
+//!
+//! **Not implemented.**
+//!
+//! Tier 1 of the roadmap in `docs/02-scope.pdf`.

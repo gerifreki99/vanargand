@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2026 Freki Geri
+# SPDX-License-Identifier: MIT OR Apache-2.0
+#
+# Pinned so that a consensus binary built by two people is the same binary
+# (G3: reproducible builds).
+
+[toolchain]
+channel = "1.85.0"
+components = ["rustfmt", "clippy"]

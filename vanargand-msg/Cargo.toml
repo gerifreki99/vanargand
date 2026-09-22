@@ -1,8 +1,19 @@
-﻿[package]
+# SPDX-FileCopyrightText: 2026 Freki Geri
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[package]
 name = "vanargand-msg"
-version = "0.0.0"
-edition = "2021"
-authors = ["Freki Geri <geri.freki99@gmail.com>"]
-license = "MIT OR Apache-2.0"
-description = "Messagerie chiffree de bout en bout : etablissement de session, double cliquet (ratchet), MLS pour les groupes, relais pour destinataires absents. Reserve -- implementation a venir."
-repository = "https://github.com/gerifreki99/vanargand"
+description = "Messagerie chiffree de bout en bout : etablissement de session, double cliquet (ratchet), MLS pour les groupes, relais pour destinataires absents."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+vanargand-crypto.workspace = true
+vanargand-types.workspace = true

@@ -1,0 +1,99 @@
+# SPDX-FileCopyrightText: 2026 Freki Geri
+# SPDX-License-Identifier: MIT OR Apache-2.0
+#
+# Build, test and lint. The licence check lives in reuse.yml.
+#
+# The job worth explaining is `vectors`: it regenerates the conformance vectors
+# with tools/vectorgen/generate.py and fails if the committed files differ. That
+# generator is a second implementation of the frozen encoding, written from the
+# prose rather than from the Rust, so the pair of jobs below answers two
+# different questions — `test` asks whether the Rust agrees with the vectors,
+# and `vectors` asks whether the vectors still agree with the specification they
+# were derived from. Letting the generator drift would quietly turn the vectors
+# into a mirror of the code, which is the one thing they must never be.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  test:
+    name: build and test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Formatting
+        run: cargo fmt --all --check
+
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --all-features
+
+      - name: Tests
+        run: cargo test --workspace --all-features
+
+      - name: Documentation builds and its links resolve
+        run: cargo doc --workspace --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  vectors:
+    name: conformance vectors are reproducible
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install the generator's only dependency
+        run: pip install blake3
+      - name: Vectors match the independent implementation
+        run: python tools/vectorgen/generate.py --check
+
+  determinism:
+    name: determinism rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # clippy.toml already fails the build on HashMap, HashSet and the system
+      # clock. This job catches the ways round it that a lint cannot see: a type
+      # alias, a fully qualified path, a re-export under another name.
+      #
+      # Comment lines are filtered out, because these crates document *why*
+      # these things are forbidden and a rule that fires on its own rationale is
+      # a rule people delete.
+      - name: No hash-based collections, floating point or system clock
+        run: |
+          set -euo pipefail
+          CRATES="vanargand-types vanargand-crypto vanargand-state vanargand-consensus"
+
+          check() {
+            local pattern="$1" message="$2" hits
+            hits=$(grep -rnE "$pattern" --include='*.rs' $CRATES 2>/dev/null \
+                   | grep -vE '^[^:]+:[0-9]+: *(//|\*)' || true)
+            if [ -n "$hits" ]; then
+              echo "::error::$message"
+              echo "$hits"
+              return 1
+            fi
+          }
+
+          failed=0
+          check '\b(HashMap|HashSet|RandomState)\b' \
+            'hash-based collection: iteration order is randomised and will diverge honest nodes' || failed=1
+          check '\b(f32|f64)\b' \
+            'floating point in a crate that feeds state' || failed=1
+          check '(SystemTime|Instant::now|UNIX_EPOCH|\bchrono\b)' \
+            'the only clock in Vanargand is block height' || failed=1
+          exit $failed

@@ -1,8 +1,32 @@
-﻿[package]
+# SPDX-FileCopyrightText: 2026 Freki Geri
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[package]
 name = "vanargand-crypto"
-version = "0.0.0"
-edition = "2021"
-authors = ["Freki Geri <geri.freki99@gmail.com>"]
-license = "MIT OR Apache-2.0"
-description = "Primitives cryptographiques (ML-DSA-44, ML-KEM-768, BLAKE3, ChaCha20-Poly1305, HKDF) -- seul point d'acces aux primitives, isole le choix de bibliotheque post-quantique du reste du code. Reserve -- implementation a venir."
-repository = "https://github.com/gerifreki99/vanargand"
+description = "Primitives cryptographiques (ML-DSA-44, ML-KEM-768, BLAKE3) -- seul point d'acces aux primitives, isole le choix de bibliotheque post-quantique du reste du code."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+blake3.workspace = true
+
+# No post-quantum library is a dependency yet, and that is a deliberate state
+# rather than an oversight: see BACKENDS.md. The traits, the algorithm registry
+# and a conformance harness that any candidate must pass are all here; wiring a
+# library is a contained piece of work that the harness then judges.
+
+[features]
+default = []
+
+# Registers the deterministic, INSECURE test signer under algorithm id 0x10, so
+# that the rest of the workspace can be tested end to end without a
+# post-quantum dependency. Id 0x10 is rejected by consensus by construction; see
+# `AlgorithmId::valid_on_live_chain`. Enable in `[dev-dependencies]` only.
+test-backend = []

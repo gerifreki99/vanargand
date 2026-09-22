@@ -4,6 +4,13 @@
 *.pdb
 Cargo.lock.orig
 
+# Python tooling (tools/vectorgen). Byte-code caches carry no SPDX header and
+# would fail the REUSE check if they were ever committed.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
 # Simulation output
 /sim-out/
 *.csv.tmp

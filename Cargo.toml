@@ -1,0 +1,104 @@
+# SPDX-FileCopyrightText: 2026 Freki Geri
+# SPDX-License-Identifier: MIT OR Apache-2.0
+
+[workspace]
+resolver = "2"
+members = [
+    "vanargand",
+    "vanargand-archive",
+    "vanargand-bourse",
+    "vanargand-bridge",
+    "vanargand-cli",
+    "vanargand-consensus",
+    "vanargand-contracts",
+    "vanargand-crypto",
+    "vanargand-explorer",
+    "vanargand-federation",
+    "vanargand-msg",
+    "vanargand-net",
+    "vanargand-node",
+    "vanargand-state",
+    "vanargand-storage",
+    "vanargand-types",
+    "vanargand-wallet",
+]
+
+[workspace.package]
+version = "0.0.0"
+edition = "2021"
+rust-version = "1.85"
+authors = ["Freki Geri <geri.freki99@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/gerifreki99/vanargand"
+
+[workspace.dependencies]
+vanargand-archive = { path = "vanargand-archive", version = "0.0.0" }
+vanargand-bourse = { path = "vanargand-bourse", version = "0.0.0" }
+vanargand-bridge = { path = "vanargand-bridge", version = "0.0.0" }
+vanargand-consensus = { path = "vanargand-consensus", version = "0.0.0" }
+vanargand-contracts = { path = "vanargand-contracts", version = "0.0.0" }
+vanargand-crypto = { path = "vanargand-crypto", version = "0.0.0" }
+vanargand-federation = { path = "vanargand-federation", version = "0.0.0" }
+vanargand-msg = { path = "vanargand-msg", version = "0.0.0" }
+vanargand-net = { path = "vanargand-net", version = "0.0.0" }
+vanargand-state = { path = "vanargand-state", version = "0.0.0" }
+vanargand-storage = { path = "vanargand-storage", version = "0.0.0" }
+vanargand-types = { path = "vanargand-types", version = "0.0.0" }
+
+# Third-party. Kept deliberately short: every dependency in the state-transition
+# path is a consensus dependency, and a consensus dependency is a consensus risk.
+blake3 = "1"
+
+# Test-only. Reads the conformance vectors in spec/vectors/. Never a
+# [dependencies] entry anywhere: a node does not parse JSON.
+serde_json = "1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_docs = "warn"
+unreachable_pub = "warn"
+
+# The determinism rules of CONTRIBUTING.md, made executable. A rule that only
+# lives in a document is a rule that gets broken during a long afternoon.
+#
+# On the levels: `deny` is reserved for rules where a single violation is a
+# defect and the fix is always local. `warn` is for rules that are right most of
+# the time but whose blanket denial would fill the code with `#[allow]`, which
+# is worse than the warning — an `#[allow]` that everybody stops reading defeats
+# the lint, so it is not used as a routine escape hatch here.
+[workspace.lints.clippy]
+# "Pas de flottants dans quoi que ce soit qui affecte l'état." Absolute: there
+# is no floating point anywhere in this workspace, including in tests, and no
+# legitimate reason to add one.
+float_arithmetic = "deny"
+# A node that panics on untrusted input has a remote kill switch. Allowed in
+# tests via clippy.toml, where a panic is the assertion.
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+# Casts that silently lose information are how consensus splits are born.
+cast_possible_truncation = "deny"
+cast_possible_wrap = "deny"
+cast_sign_loss = "deny"
+cast_precision_loss = "deny"
+# Wrap-around and division by zero. Warn rather than deny: loop counters and
+# array offsets would otherwise need an allow on every line, and the rule that
+# actually matters — no unchecked arithmetic on a value or a balance — is
+# enforced by construction in `vanargand_types::Amount`, which exposes no
+# operators at all.
+arithmetic_side_effects = "warn"
+# Everything else: the usual bar.
+pedantic = { level = "warn", priority = -1 }
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+
+[profile.release]
+# A consensus node must abort on overflow rather than quietly disagree with its
+# peers. This costs a few percent and buys determinism.
+overflow-checks = true
+panic = "abort"
+lto = "thin"
+codegen-units = 1
+
+[profile.bench]
+overflow-checks = true

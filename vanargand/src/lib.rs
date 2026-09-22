@@ -1,14 +1,12 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+// SPDX-FileCopyrightText: 2026 Freki Geri
+// SPDX-License-Identifier: MIT OR Apache-2.0
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+//! The project's bare name: a façade that re-exports the crates a consumer
+//! actually wants.
+//!
+//! Empty until there is a stable surface worth re-exporting. Publishing a
+//! façade before the crates behind it have settled means every one of their
+//! breaking changes becomes a breaking change here too, which is the opposite
+//! of what a façade is for.
+//!
+//! Use [`vanargand_types`] and [`vanargand_crypto`] directly in the meantime.
