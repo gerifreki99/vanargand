@@ -390,6 +390,32 @@ fn identifier_and_address_vectors_match() {
 }
 
 #[test]
+fn bech32_strings_are_recognised_rather_than_dismissed_as_typos() {
+    // These are valid Bech32 (BIP-173) and therefore invalid Bech32m. The
+    // distinction is worth a test of its own because the two failures send a
+    // user looking in completely different places: "this is the wrong kind of
+    // address" and "check for a typo" are not the same message.
+    //
+    // The vectors are machine-checked at generation time — `self_check` in the
+    // generator asserts each really does verify under the Bech32 constant —
+    // after three hand-transcribed vectors in this project turned out to be
+    // wrong.
+    let file = vectors("03-addresses.json");
+    let cases = array(&file, "bech32_not_bech32m");
+    assert!(!cases.is_empty(), "the vector file lost its Bech32 set");
+
+    for case in cases {
+        let candidate = case.as_str().expect("a Bech32 vector is a string");
+        assert_eq!(
+            vanargand_types::bech32::decode(candidate).err(),
+            Some(vanargand_types::bech32::Bech32Error::WrongVariantBech32),
+            "{candidate} was not recognised as a Bech32 string"
+        );
+        assert!(Address::parse_on(Network::Mainnet, candidate).is_err());
+    }
+}
+
+#[test]
 fn address_rejection_vectors_are_rejected() {
     let file = vectors("03-addresses.json");
     for case in array(&file, "reject") {

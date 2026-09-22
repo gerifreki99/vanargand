@@ -103,9 +103,21 @@ l'affaiblissement de cette thèse par rapport à sa formulation initiale.
 | Preuve d'équivoque de compte (R2) | Implémenté |
 | En-tête de bloc, échelle de finalité, horloges de contestation | Implémenté |
 | Arbre de Merkle épars, preuves d'inclusion **et de non-inclusion** | Implémenté |
-| Registre : 6 types de transaction sur 21, plafond nomade appliqué | Partiel |
+| Registre : **les 21 types de transaction**, plafond nomade appliqué | Implémenté |
+| Monnaies locales — l'inversion monétaire R2 — émises et réglées de bout en bout | Implémenté |
+| Équivoque de compte : fraude auto-prouvante, condamnée et saisie | Implémenté |
+| Noms (engagement-révélation), gardiens, récupération sociale | Implémenté |
+| Poids, tirage du comité, certificats, fuite d'inactivité | Implémenté |
+| Bourses : PayWord, fermeture, contestation, guetteurs | Implémenté |
+| Fonction à délai de l'aléa d'époque, avec preuve de travail séquentiel | Implémenté |
+| La preuve **succincte** (STARK) que la R2 met sur le chemin de lancement | **Non commencée** |
 | Bibliothèques post-quantiques (signature, KEM) | **Interface seule** |
-| Consensus, réseau, messagerie, bourses, stockage, ponts | Non commencé |
+| Validation de bloc : en-tête, comité, révélation, corps, racine d'état, certificat | Implémenté |
+| Production de bloc, et l'aller-retour construire-puis-valider | Implémenté |
+| Politique de sélection : listes d'inclusion, ordre anti-front-running | Non commencée |
+| Courbe d'émission, borne de régénération, contrôle aux frontières à chaque bloc | Implémenté |
+| *Distribution* de l'émission — missions, crédits d'usage, vesting, caution auto-constituée | Non commencée |
+| Réseau, messagerie, stockage, ponts | Non commencé |
 
 La couche signature mérite d'être isolée. `vanargand-crypto` contient le
 registre des algorithmes, les traits, et une suite de conformité
@@ -115,12 +127,17 @@ assumé, pas un oubli. Un adaptateur écrit contre une API que personne n'a
 compilée a l'air fini et ne l'est pas. Voir
 [`vanargand-crypto/BACKENDS.md`](vanargand-crypto/BACKENDS.md).
 
-Deux trouvailles nées de l'écriture du code sont consignées dans le brouillon
-de spécification plutôt que résolues discrètement : le plafond hors-ligne ne
-couvre pas les monnaies locales, c'est-à-dire exactement le paiement autour
-duquel le pilote du Cran 1 est construit
-([`04-transactions.md`](spec/draft/04-transactions.md) §4.1) ; et le seuil des
-noms premium de la R1.7 contredit son propre exemple `@marie` (§6.1).
+Trois trouvailles nées de l'écriture du code sont consignées plutôt que résolues
+discrètement : le plafond hors-ligne ne couvre pas les monnaies locales,
+c'est-à-dire exactement le paiement autour duquel le pilote du Cran 1 est
+construit ([`04-transactions.md`](spec/draft/04-transactions.md) §4.1) ; le
+seuil des noms premium de la R1.7 contredit son propre exemple `@marie`
+(§6.1) ; et **la caution est écrite à deux endroits** — dans le registre et
+dans l'ensemble des validateurs du consensus, sans rien pour les réconcilier,
+alors que le poids du comité vient du second
+([`vanargand-node`](vanargand-node/src/lib.rs)). La troisième n'est apparue
+qu'en faisant enfin travailler les caisses ensemble, ce qui est l'argument pour
+avoir écrit le pipeline de validation avant la couche réseau.
 
 ## Organisation du dépôt
 
@@ -132,6 +149,9 @@ tools/vectorgen/    Une seconde implémentation, en Python, qui les engendre
 vanargand-crypto/   Interface des primitives : hachage, chaînes, clés, traits
 vanargand-types/    Encodage canonique, identifiants, adresses, transactions, blocs
 vanargand-state/    Arbre de Merkle épars, modèle de compte, transitions d'état
+vanargand-consensus/ Poids, aléa d'époque, tirage du comité, certificats, fuite
+vanargand-bourse/   PayWord, fermeture de bourse, contestation, guetteurs
+vanargand-node/     Assemblage du bloc et pipeline de validation
 vanargand-*/        Réservées, documentées, non implémentées
 ```
 
@@ -196,8 +216,9 @@ tort — ou la spécification est assez ambiguë pour que deux lecteurs en tiren
 deux choses, ce qui est le plus précieux des trois cas.
 
 Ensuite : une bibliothèque post-quantique qui passe
-`vanargand_crypto::sign::conformance::check`, et les quinze types de transaction
-que le registre n'applique pas encore.
+`vanargand_crypto::sign::conformance::check`, une preuve succincte pour la
+fonction à délai, et les parties qui n'ont aucun code — le réseau, la
+messagerie, le stockage, et le nœud qui les relierait.
 
 ## Sécurité
 

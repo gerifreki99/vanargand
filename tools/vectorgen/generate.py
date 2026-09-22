@@ -102,6 +102,8 @@ DOMAINS = [
     "vanargand v1 commitment chain",
     "vanargand v1 payword",
     "vanargand v1 epoch seed",
+    "vanargand v1 delay function",
+    "vanargand v1 committee draw",
 ]
 
 
@@ -120,6 +122,30 @@ def chain_root(context: str, seed: bytes, length: int) -> list[bytes]:
     for index in range(length - 1, -1, -1):
         links[index] = h(context, links[index + 1])
     return links
+
+
+def delay_iterate(value: bytes, count: int) -> bytes:
+    """Iterate the sequential delay function.
+
+    Inherently serial: each step needs the previous one. That is the point —
+    the last proposer of an epoch must not be able to try several variants of
+    the seed within its turn.
+    """
+    for _ in range(count):
+        value = h("vanargand v1 delay function", value)
+    return value
+
+
+def delay_checkpoints(value: bytes, iterations: int, segments: int) -> list[bytes]:
+    """The checkpoints of a proof of sequential work: input, boundaries, output."""
+    if segments <= 0 or iterations % segments:
+        raise ValueError("iterations must be a positive multiple of segments")
+    length = iterations // segments
+    points = [value]
+    for _ in range(segments):
+        value = delay_iterate(value, length)
+        points.append(value)
+    return points
 
 
 def merkle_list_root(leaves: list[bytes]) -> bytes:
@@ -147,6 +173,9 @@ def merkle_list_root(leaves: list[bytes]) -> bytes:
 
 CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
 BECH32M_CONST = 0x2BC830A3
+# BIP-173's constant. Kept so that a Bech32 string can be *recognised* and
+# reported as such rather than dismissed as a typo.
+BECH32_CONST = 1
 
 
 def bech32_polymod(values: list[int]) -> int:
@@ -189,6 +218,36 @@ def bech32m_decode(text: str) -> tuple[str, list[int]]:
     if bech32_polymod(bech32_hrp_expand(hrp) + data) != BECH32M_CONST:
         raise ValueError("bad checksum")
     return hrp, data[:-6]
+
+
+def bech32_variant(text: str) -> str:
+    """Classify a string: 'bech32m', 'bech32', or why it is neither.
+
+    Exists so that a reference vector can be *checked* rather than trusted.
+    Three separate hand-transcribed vectors in this project turned out to be
+    wrong — twice a truncated Bech32m string, once a Bech32 string that was not
+    valid under either constant — and each one was discovered by a failing test
+    somewhere downstream rather than here, where it belongs.
+    """
+    if len(text) > 90:
+        return "too long"
+    if text.lower() != text and text.upper() != text:
+        return "mixed case"
+    low = text.lower()
+    position = low.rfind("1")
+    if position < 1 or position + 7 > len(low):
+        return "bad separator position"
+    hrp, data_part = low[:position], low[position + 1 :]
+    if any(not (33 <= ord(c) <= 126) for c in hrp):
+        return "bad hrp character"
+    if any(c not in CHARSET for c in data_part):
+        return "bad data character"
+    checksum = bech32_polymod(bech32_hrp_expand(hrp) + [CHARSET.index(c) for c in data_part])
+    if checksum == BECH32M_CONST:
+        return "bech32m"
+    if checksum == BECH32_CONST:
+        return "bech32"
+    return "bad checksum"
 
 
 def convert_bits(data: list[int], frm: int, to: int, pad: bool) -> list[int]:
@@ -267,19 +326,51 @@ BIP350_INVALID = [
     "M1VUXWEZ",
     "16plkw9",
     "1p2gdwpf",
-    "A1G7SGD8",  # valid Bech32, not Bech32m
+]
+
+# Strings that are valid **Bech32** (BIP-173) and therefore invalid Bech32m.
+#
+# These matter more than they look. A wallet handed one of these should tell
+# its user "this is the wrong kind of address", not "check for a typo" — the
+# two send someone looking in completely different places. `self_check` asserts
+# that each really does verify under the Bech32 constant, so a mis-transcribed
+# entry fails here rather than in a Rust test three layers away.
+BIP173_VALID_BECH32 = [
+    "A12UEL5L",
+    "a12uel5l",
+    "an83characterlonghumanreadablepartthatcontainsthenumber1andt"
+    "heexcludedcharactersbio1tt5tgs",
+    "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
+    "?1ezyfcl",
 ]
 
 
 def self_check() -> None:
     for text in BIP350_VALID:
         bech32m_decode(text)
+        variant = bech32_variant(text)
+        if variant != "bech32m":
+            raise AssertionError(f"BIP-350 valid vector classifies as {variant}: {text}")
     for text in BIP350_INVALID:
         try:
             bech32m_decode(text)
         except ValueError:
             continue
         raise AssertionError(f"BIP-350 invalid vector was accepted: {text}")
+
+    # Each of these must verify under the Bech32 constant and fail under
+    # Bech32m's. A transcription slip shows up here, not downstream.
+    for text in BIP173_VALID_BECH32:
+        variant = bech32_variant(text)
+        if variant != "bech32":
+            raise AssertionError(
+                f"expected a valid Bech32 string, got {variant}: {text}"
+            )
+        try:
+            bech32m_decode(text)
+        except ValueError:
+            continue
+        raise AssertionError(f"a Bech32 string was accepted as Bech32m: {text}")
 
     for value in [0, 1, 127, 128, 300, 2**32 - 1, 2**64 - 1]:
         assert varint_decode(varint_encode(value)) == (value, len(varint_encode(value)))
@@ -409,12 +500,38 @@ def build_hashing() -> dict:
             }
         )
 
+    delay = []
+    for iterations in [0, 1, 2, 10, 256]:
+        seed = bytes([0x42]) * 32
+        delay.append(
+            {
+                "input": hx(seed),
+                "iterations": iterations,
+                "output": hx(delay_iterate(seed, iterations)),
+            }
+        )
+
+    delay_proofs = []
+    for iterations, segments in [(64, 8), (256, 16), (4096, 64)]:
+        seed = bytes([0x42]) * 32
+        points = delay_checkpoints(seed, iterations, segments)
+        delay_proofs.append(
+            {
+                "input": hx(seed),
+                "iterations": iterations,
+                "segments": segments,
+                "checkpoints": [hx(point) for point in points],
+            }
+        )
+
     return {
         "_": "Generated by tools/vectorgen/generate.py — do not edit by hand.",
         "spec": "spec/draft/02-hashing.md",
         "registry": registry,
         "chains": chains,
         "merkle_list": merkle,
+        "delay": delay,
+        "delay_proofs": delay_proofs,
     }
 
 
@@ -480,8 +597,11 @@ def build_addresses() -> dict:
          "reason": "truncated, checksum fails"},
         {"address": address_text("tvan", 0, bytes(32)),
          "reason": "test network address, rejected on mainnet"},
-        {"address": "A1G7SGD8", "reason": "Bech32 rather than Bech32m"},
         {"address": "van1qqqqq", "reason": "payload is not 32 bytes"},
+    ]
+    rejects += [
+        {"address": text, "reason": "valid Bech32, therefore invalid Bech32m"}
+        for text in BIP173_VALID_BECH32
     ]
 
     return {
@@ -491,6 +611,10 @@ def build_addresses() -> dict:
         "identifiers": identifiers,
         "addresses": addresses,
         "reject": rejects,
+        # Kept apart from `reject` because a consumer should check the *reason*
+        # here, not merely that the string was refused: the whole point is that
+        # a Bech32 string is a recognisable thing and not a typo.
+        "bech32_not_bech32m": BIP173_VALID_BECH32,
     }
 
 

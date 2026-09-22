@@ -23,6 +23,10 @@ only depend on the ones before it.
 | [`03-addresses.md`](03-addresses.md) | Key hierarchy, address derivation, Bech32m `van1…` | 01, 02 |
 | [`04-transactions.md`](04-transactions.md) | Transaction envelope, 2D nonce, Tier 1 transaction types | 01–03 |
 | [`05-blocks.md`](05-blocks.md) | Block header, finality rungs, provisional whitelist | 01–04 |
+| [`06-state.md`](06-state.md) | Sparse Merkle tree, account record, transition order | 01–05 |
+| [`07-consensus.md`](07-consensus.md) | Validator weight, committee sampling, certificates, inactivity leak | 01–06 |
+| [`08-bourse.md`](08-bourse.md) | PayWord, channel closing, the C9 parade, watchtowers | 01–05 |
+| [`09-emission.md`](09-emission.md) | The curve, regeneration, and the border check | 01–07 |
 
 ## Scope
 

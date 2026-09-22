@@ -20,7 +20,6 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: -D warnings
 
 jobs:
   test:
@@ -36,11 +35,25 @@ jobs:
       - name: Formatting
         run: cargo fmt --all --check
 
+      # Clippy runs **without** `-D warnings`, deliberately.
+      #
+      # The workspace lint table in Cargo.toml already denies the rules that
+      # are defects wherever they appear — floating point, `unwrap`, lossy
+      # casts — and those still fail this step. `pedantic` is set to warn
+      # because it is right most of the time and wrong some of the time, and a
+      # pipeline that fails on advice is a pipeline whose advice gets switched
+      # off within a fortnight. Warnings are for reading; denials are for
+      # stopping.
       - name: Clippy
         run: cargo clippy --workspace --all-targets --all-features
 
+      # The compiler's own warnings *are* denied: an unused import, dead code
+      # or a public item without documentation is a fact about the code, not a
+      # matter of taste.
       - name: Tests
         run: cargo test --workspace --all-features
+        env:
+          RUSTFLAGS: -D warnings
 
       - name: Documentation builds and its links resolve
         run: cargo doc --workspace --no-deps
@@ -76,7 +89,8 @@ jobs:
       - name: No hash-based collections, floating point or system clock
         run: |
           set -euo pipefail
-          CRATES="vanargand-types vanargand-crypto vanargand-state vanargand-consensus"
+          CRATES="vanargand-types vanargand-crypto vanargand-state \
+                  vanargand-consensus vanargand-bourse vanargand-node"
 
           check() {
             local pattern="$1" message="$2" hits

@@ -596,20 +596,21 @@ fn the_burn_counter_is_committed_to_by_the_state_root() {
 // --------------------------------------------------------------------------
 
 #[test]
-fn unimplemented_kinds_say_so_loudly() {
-    // Not a design. A chain must not be run while any kind returns this.
+fn every_defined_kind_is_dispatched() {
+    // `StateError::NotImplemented` is a loud placeholder, not a design, and as
+    // of now no variant of `TxKind` reaches it. The wildcard arm survives only
+    // because the enum is `#[non_exhaustive]`, so a kind added tomorrow still
+    // fails safe rather than being silently ignored.
+    //
+    // Checked through a kind that used to be the placeholder's example.
     let (mut ledger, key, marie, _) = village();
     let ctx = context(FinalityRung::Chain);
-    let unimplemented = body(
+    let commit = body(
         marie,
         &key.verifying,
         0,
         TxKind::NameCommit { commitment: Hash::from_bytes([1; 32]) },
     );
-    assert_eq!(
-        ledger.apply(&ctx, &unimplemented),
-        Err(StateError::NotImplemented { kind: "name_commit" })
-    );
-    // And, being a failure, it changed nothing.
-    assert_eq!(ledger.account(&marie).unwrap().balance(None), Amount::from_ulf(10_000));
+    assert_eq!(ledger.apply(&ctx, &commit).map(|applied| applied.nomad_consumed), Ok(Amount::ZERO));
+    assert_eq!(ledger.names().commitments().count(), 1);
 }

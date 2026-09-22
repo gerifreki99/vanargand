@@ -168,6 +168,40 @@ Two rules make it safe:
   Decoders MUST additionally bound nesting depth, because the rejection happens
   after the parse.
 
+## 5.1 `recovery_start` is one guardian's approval, not the whole recovery
+
+A transaction envelope carries **one** signature, so a three-of-five recovery
+cannot be a single transaction. Two shapes were available: put a list of
+guardian signatures in the payload, or let each guardian send its own
+`recovery_start` naming the same target and the same new root key, and
+accumulate the approvals on chain.
+
+This specification takes the second. It needs no aggregate-signature format,
+each guardian signs with its own device under its own nonce lane, and — the
+reason that decides it — guardians can approve from different sides of a
+partition without coordinating, which is the normal condition this protocol was
+built for. The cost is several transactions and several fees per recovery.
+
+Three rules make the accumulation safe:
+
+- **A conflicting key is refused.** Once approvals exist for one key, an
+  approval naming a different key is invalid. Without this, the last guardian to
+  approve picks the key, turning a three-of-five into a one-of-five in favour of
+  whoever approved last.
+- **Later approvals do not restart the window.** Otherwise a guardian holds one
+  approval back and keeps the window open indefinitely, so an owner who
+  cancelled once has to keep cancelling.
+- **Completion requires the threshold *and* the elapsed window.** The threshold
+  alone would let colluding guardians act before the owner could notice; the
+  window alone would let one guardian take an account by waiting.
+
+`recovery_finalise` revokes **every** existing device, permanently. A recovery
+happens because the old devices are gone or compromised; leaving one able to
+sign makes the recovery pointless in the first case and dangerous in the second.
+A recovered account also starts with **no offline credit**: the nomad credit is
+a promise made to strangers about what they can safely accept, and the account
+has just demonstrated it lost control of its keys.
+
 ## 6. Names
 
 `name_commit` then `name_reveal`, per R1.7 — F4 front-running was an

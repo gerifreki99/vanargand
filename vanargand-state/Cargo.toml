@@ -15,6 +15,7 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+vanargand-bourse.workspace = true
 vanargand-crypto.workspace = true
 vanargand-types.workspace = true
 

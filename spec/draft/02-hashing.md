@@ -67,7 +67,9 @@ means adding a line here first.
 | `vanargand v1 state value` | canonical encoding of a stored record | 06 |
 | `vanargand v1 commitment chain` | previous link | 05 |
 | `vanargand v1 payword` | previous token | (Tier 1, bourse) |
-| `vanargand v1 epoch seed` | mixed reveals ‖ epoch number | 05 |
+| `vanargand v1 epoch seed` | mixed reveals ‖ epoch number | 05, 07 |
+| `vanargand v1 delay function` | previous iterate | 07 |
+| `vanargand v1 committee draw` | seed ‖ round or position counter | 07 |
 
 `algorithm_id` is a single byte, per `03-addresses.md` §2.
 

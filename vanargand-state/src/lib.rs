@@ -29,16 +29,32 @@
 //!
 //! # State of completeness
 //!
-//! Six transaction kinds apply; the rest return
-//! [`ledger::StateError::NotImplemented`]. The sparse Merkle tree is complete,
-//! including non-inclusion proofs. Both the tree and the ledger recompute their
-//! root from scratch, which is correct and is not what a production node should
-//! run — see the notes on each.
+//! **All twenty-one transaction kinds apply.** The sparse Merkle tree is
+//! complete, including non-inclusion proofs.
+//!
+//! What is not finished is performance and one gap of substance. Both the tree
+//! and the ledger recompute their root from scratch, which is correct and is
+//! not what a production node should run — see the notes on each. And the
+//! offline ceiling still does not cover local assets, which is exactly the
+//! payment the Tier 1 pilot is built around; it is recorded in
+//! `spec/draft/04-transactions.md` §4.1 and pinned by a test rather than
+//! quietly resolved.
 
 pub mod account;
+pub mod asset;
+pub mod keys;
 pub mod ledger;
+pub mod name_book;
+pub mod purse_book;
+pub mod recovery;
+pub mod slashing;
 pub mod smt;
 
 pub use account::{Account, Device};
+pub use asset::{AssetError, AssetRecord, AssetRegistry};
 pub use ledger::{Applied, BlockContext, Ledger, StateError};
+pub use name_book::{NameBook, NameError};
+pub use purse_book::{Payout, PurseBook, PurseBookError};
+pub use recovery::{PendingRecovery, RecoveryBook, RecoveryError};
+pub use slashing::{AccountOffence, Penalty, SlashingBook, SlashingError, ValidatorOffence};
 pub use smt::{SmtLeaf, SmtProof, SparseMerkleTree};

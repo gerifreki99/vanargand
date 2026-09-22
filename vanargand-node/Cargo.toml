@@ -15,6 +15,12 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+vanargand-consensus.workspace = true
 vanargand-crypto.workspace = true
-vanargand-types.workspace = true
 vanargand-state.workspace = true
+vanargand-types.workspace = true
+
+[dev-dependencies]
+# The insecure test signer, so that a block can be proposed, signed, certified
+# and validated end to end without a post-quantum dependency.
+vanargand-crypto = { workspace = true, features = ["test-backend"] }

@@ -98,9 +98,21 @@ weakened from its original form.
 | Account equivocation evidence (R2) | Implemented |
 | Block header, finality ladder, contestation clocks | Implemented |
 | Sparse Merkle tree, inclusion **and non-inclusion** proofs | Implemented |
-| Ledger: 6 of 21 transaction kinds, nomad credit enforcement | Partial |
+| Ledger: **all 21 transaction kinds**, nomad credit enforcement | Implemented |
+| Local assets — R2's monetary inversion — issued and settled end to end | Implemented |
+| Account equivocation: self-proving fraud, convicted and seized | Implemented |
+| Names (commit-reveal), guardians, social recovery | Implemented |
+| Validator weight, committee sampling, certificates, inactivity leak | Implemented |
+| Channels: PayWord, closing, disputes, watchtowers | Implemented |
+| Epoch-seed delay function, with a checkpointed proof of sequential work | Implemented |
+| The **succinct** (STARK) proof R2 puts on the launch path | **Not started** |
 | Post-quantum signature and KEM backends | **Interface only** |
-| Consensus, networking, messaging, channels, storage, bridges | Not started |
+| Block validation: header, committee, reveal, body, state root, certificate | Implemented |
+| Block production, and the build-then-validate round trip | Implemented |
+| Transaction selection policy: inclusion lists, anti-front-running ordering | Not started |
+| Emission curve, regeneration bound, and the border check on every block | Implemented |
+| Emission *distribution* — missions, usage credits, vesting, self-constituting bond | Not started |
+| Networking, messaging, storage, bridges | Not started |
 
 The signature layer is worth singling out. `vanargand-crypto` has the algorithm
 registry, the traits, and a behavioural conformance suite a backend must pass —
@@ -109,11 +121,16 @@ state rather than an oversight. An adapter written against an API nobody
 compiled looks finished and is not. See
 [`vanargand-crypto/BACKENDS.md`](vanargand-crypto/BACKENDS.md).
 
-Two findings from writing the code are recorded in the draft specification
-rather than quietly resolved: the offline ceiling does not cover local assets,
-which is exactly the payment the Tier 1 pilot is built around
-([`04-transactions.md`](spec/draft/04-transactions.md) §4.1), and R1.7's premium
-name threshold contradicts its own `@marie` example (§6.1).
+Three findings from writing the code are recorded rather than quietly resolved:
+the offline ceiling does not cover local assets, which is exactly the payment
+the Tier 1 pilot is built around
+([`04-transactions.md`](spec/draft/04-transactions.md) §4.1); R1.7's premium
+name threshold contradicts its own `@marie` example (§6.1); and **bonded stake
+is written down twice** — in the ledger and in the consensus validator set,
+with nothing reconciling them, although committee weight is drawn from the
+second ([`vanargand-node`](vanargand-node/src/lib.rs)). The third only became
+visible when the crates were finally made to work together, which is the
+argument for having built the validation pipeline before the network layer.
 
 ## Repository layout
 
@@ -125,6 +142,9 @@ tools/vectorgen/    A second implementation, in Python, that generates them
 vanargand-crypto/   Primitives interface: hashing, chains, key hierarchy, traits
 vanargand-types/    Canonical encoding, identifiers, addresses, transactions, blocks
 vanargand-state/    Sparse Merkle tree, account model, state transitions
+vanargand-consensus/ Weight, epoch seed, committee draw, certificates, leak
+vanargand-bourse/   PayWord, channel closing, disputes, watchtowers
+vanargand-node/     Block assembly and the validation pipeline
 vanargand-*/        Reserved, documented, not implemented
 ```
 
@@ -186,8 +206,9 @@ or the specification is ambiguous enough that two readers of it diverged, which
 is the most valuable of the three outcomes.
 
 After that: a post-quantum backend that passes
-`vanargand_crypto::sign::conformance::check`, and the fifteen transaction kinds
-the ledger does not yet apply.
+`vanargand_crypto::sign::conformance::check`, a succinct proof for the delay
+function, and the parts that have no code at all — networking, messaging,
+storage, and the node that would tie them together.
 
 ## Security
 

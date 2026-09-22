@@ -181,12 +181,35 @@
       "reason": "test network address, rejected on mainnet"
     },
     {
-      "address": "A1G7SGD8",
-      "reason": "Bech32 rather than Bech32m"
-    },
-    {
       "address": "van1qqqqq",
       "reason": "payload is not 32 bytes"
+    },
+    {
+      "address": "A12UEL5L",
+      "reason": "valid Bech32, therefore invalid Bech32m"
+    },
+    {
+      "address": "a12uel5l",
+      "reason": "valid Bech32, therefore invalid Bech32m"
+    },
+    {
+      "address": "an83characterlonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1tt5tgs",
+      "reason": "valid Bech32, therefore invalid Bech32m"
+    },
+    {
+      "address": "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
+      "reason": "valid Bech32, therefore invalid Bech32m"
+    },
+    {
+      "address": "?1ezyfcl",
+      "reason": "valid Bech32, therefore invalid Bech32m"
     }
+  ],
+  "bech32_not_bech32m": [
+    "A12UEL5L",
+    "a12uel5l",
+    "an83characterlonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1tt5tgs",
+    "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
+    "?1ezyfcl"
   ]
 }

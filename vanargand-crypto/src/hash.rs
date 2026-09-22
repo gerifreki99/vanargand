@@ -91,6 +91,21 @@ pub mod domain {
     pub const PAYWORD: Context = Context::new("vanargand v1 payword");
     /// Epoch randomness seed, over the mixed reveals and the epoch number.
     pub const EPOCH_SEED: Context = Context::new("vanargand v1 epoch seed");
+    /// One step of the sequential delay function.
+    ///
+    /// Its own domain so that a delay-function intermediate value can never be
+    /// presented as a commitment-chain link or a PayWord token — all three are
+    /// iterated hashes of 32 bytes, which is precisely the collision of roles
+    /// this module exists to prevent.
+    pub const DELAY_FUNCTION: Context = Context::new("vanargand v1 delay function");
+    /// Committee sampling and the activation schedule, over the seed and a
+    /// round or position counter.
+    ///
+    /// Separate from [`EPOCH_SEED`] so that the seed cannot be presented as a
+    /// draw value, or a draw value as a seed. Both are 32 bytes derived from
+    /// the same input, which is exactly the situation domain separation exists
+    /// for.
+    pub const COMMITTEE_DRAW: Context = Context::new("vanargand v1 committee draw");
 
     /// Every context declared above.
     ///
@@ -113,6 +128,8 @@ pub mod domain {
         COMMITMENT_CHAIN,
         PAYWORD,
         EPOCH_SEED,
+        DELAY_FUNCTION,
+        COMMITTEE_DRAW,
     ];
 }
 
